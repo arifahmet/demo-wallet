@@ -7,8 +7,7 @@ This project is a **Spring Boot** application designed for managing transactions
 - **Transaction Management**
     - Create and process transactions (credit/debit).
     - Transactions under the configured limit are automatically approved.
-    - Transactions exceeding the limit require user action to be marked as "PENDING".
-    - Change transaction statuses (e.g., PENDING, PROCESSING, COMPLETED, FAILED).
+  - Transactions exceeding the limit are flagged as "PENDING" and require user action to approve or reject.
     - Retrieve user transactions based on specific filters (e.g., status or type).
 
 - **Reactive Design**
@@ -18,6 +17,9 @@ This project is a **Spring Boot** application designed for managing transactions
 - **Kafka Event Handling**
     - Listens to Kafka topics for transaction-related events.
     - Publishes events for downstream processing.
+
+- **Dockerized Kafka Setup**
+    - Quickly set up a Kafka instance using Docker Compose for local development and testing.
 
 - **Validation**
     - Enforces a configurable transaction limit for auto-approval.
@@ -31,27 +33,7 @@ This project is a **Spring Boot** application designed for managing transactions
 - **Reactive Kafka** (Event-driven transaction handling)
 - **Lombok** (For reducing boilerplate code)
 - **Jakarta EE** (Imports for modern Java enterprise development)
-
-## Key Features
-
-1. **Auto-Approval for Small Transactions**
-    - Transactions below the configured amount (default: 1000) are automatically approved.
-    - Saves time and reduces delays for small payments.
-
-2. **Pending Status for Large Transactions**
-    - Transactions exceeding the limit are flagged as "PENDING".
-    - Requires additional user action to approve or reject.
-
-3. **Event-Based Processing**
-    - Produces and consumes transaction-related messages in **Kafka**.
-    - Supports event-driven workflows and enables seamless integration with other services.
-
-4. **Validation and Status Management**
-    - Prevents invalid status changes with strong validation logic.
-    - Provides seamless transaction lifecycle management.
-
-5. **Transactional Repository**
-    - Provides easy integration with databases for transactional persistence.
+- **Docker & Docker Compose** (For running Kafka)
 
 ## Configuration
 
@@ -63,7 +45,32 @@ transaction-limit=1000
 
 - Transactions with an amount below this limit will be automatically approved, while those exceeding it will be marked as "PENDING".
 
-## How to Run
+## How to Run Kafka Locally with Docker Compose
+
+This project includes a `docker-compose.yaml` file in the `kafka` folder to quickly set up a local **Kafka**
+environment.
+
+1. Navigate to the `kafka` directory in the project:
+   ```bash
+   cd kafka
+   ```
+
+2. Start Kafka using Docker Compose:
+   ```bash
+   docker-compose up
+   ```
+   This will start the Kafka broker and ZooKeeper services.
+
+3. Verify Kafka is running:
+    - Kafka should now be running locally on port `9092`.
+    - Kafka topics will be automatically created as required by the application.
+
+4. Stop Kafka when done:
+   ```bash
+   docker-compose down
+   ```
+
+## How to Run the Application
 
 1. Clone the repository:
    ```bash
@@ -82,80 +89,135 @@ transaction-limit=1000
    mvn spring-boot:run
    ```
 
+Make sure **Kafka** is running before starting the application to avoid runtime errors.
+
+---
+
 ## API Endpoints
 
-### 1. Create Transaction
-- **POST** `/transactions/create`
-- Request Body:
-  ```json
-  {
-    "walletId": "12345",
-    "amount": 100.00,
-    "type": "DEBIT"
-  }
-  ```
-- Response if the transaction amount is below the limit:
-  ```json
-  {
-    "transactionId": "67890",
-    "status": "COMPLETED"
-  }
-  ```
+### Transaction Management APIs
 
-- Response if the transaction amount exceeds the limit:
-  ```json
-  {
-    "transactionId": "67891",
-    "status": "PENDING"
-  }
-  ```
+1. **Create Transaction**
+    - **POST** `/transactions/create`
+    - Request Body:
+      ```json
+      {
+        "walletId": "12345",
+        "amount": 100.00,
+        "type": "DEBIT"
+      }
+      ```
+    - Response (if the transaction amount is below the limit):
+      ```json
+      {
+        "transactionId": "67890",
+        "status": "APPROVED"
+      }
+      ```
 
-### 2. Get User Transactions
-- **GET** `/transactions`
-- Query Parameters:
-    - `walletName`: The name of the wallet
-    - `status`: Transaction status (e.g., `PENDING`, `COMPLETED`)
-    - `transactionType`: Transaction type (`CREDIT`, `DEBIT`)
+    - Response (if the transaction amount exceeds the limit):
+      ```json
+      {
+        "transactionId": "67891",
+        "status": "PENDING"
+      }
+      ```
 
-- Response:
-  ```json
-  [
-    {
-      "transactionId": "12345",
-      "amount": 50.0,
-      "status": "COMPLETED",
-      "type": "CREDIT"
-    }
-  ]
-  ```
+2. **Get User Transactions**
+    - **GET** `/transactions`
+    - Query Parameters:
+        - `walletName`: The name of the wallet
+        - `status`: Transaction status (e.g., `PENDING`, `APPROVED`, `DENIED`, `FAILED`)
+        - `transactionType`: Transaction type (`CREDIT`, `DEBIT`)
+    - Response:
+      ```json
+      [
+        {
+          "transactionId": "12345",
+          "amount": 50.0,
+          "status": "APPROVED",
+          "type": "CREDIT"
+        }
+      ]
+      ```
 
-### 3. Change Transaction Status
-- **PUT** `/transactions/change-status`
-- Request Body:
-  ```json
-  {
-    "transactionId": "12345",
-    "newStatus": "COMPLETED"
-  }
-  ```
+3. **Change Transaction Status**
+    - **PUT** `/transactions/change-status`
+    - Request Body:
+      ```json
+      {
+        "transactionId": "12345",
+        "newStatus": "APPROVED"
+      }
+      ```
+    - Response:
+      ```json
+      {
+        "message": "Transaction status updated successfully."
+      }
+      ```
 
-- Response:
-  ```json
-  {
-    "message": "Transaction status updated successfully."
-  }
-  ```
+### Credential Management APIs
 
-## Reactive Programming Explained
+1. **Login Credential**
+    - **POST** `/credentials/login`
+    - Request Body:
+      ```json
+      {
+        "username": "exampleUser",
+        "password": "examplePassword"
+      }
+      ```
+    - Response:
+      ```json
+      {
+        "token": "Bearer abc.def.ghi"
+      }
+      ```
 
-This system leverages reactive programming features with **Spring WebFlux** for non-blocking backpressure-based workflows. Key principles:
-- Mono: Represents a single, asynchronous response.
-- Flux: Handles multiple responses or streams of data asynchronously.
+### Wallet Management APIs
 
-For example:
-- **Retrieve Transactions** return a `Flux`: This allows returning zero or more `UserTransactionResponseDto` objects.
-- **Create Transaction** returns a `Mono`: This single result represents the creation of one transaction.
+1. **Get Wallet Balance**
+    - **GET** `/wallets/{walletId}/balance`
+    - Response:
+      ```json
+      {
+        "walletId": "12345",
+        "balance": 100.00
+      }
+      ```
 
+2. **Create Wallet**
+    - **POST** `/wallets/create`
+    - Request Body:
+      ```json
+      {
+        "userId": "456",
+        "initialBalance": 500.00
+      }
+      ```
+    - Response:
+      ```json
+      {
+        "walletId": "12345",
+        "balance": 500.00
+      }
+      ```
+
+### User Management APIs
+
+1. **Get User Details**
+    - **GET** `/users/{userId}/details`
+    - Response:
+      ```json
+      {
+        "userId": "456",
+        "username": "exampleUser",
+        "email": "example@example.com"
+      }
+      ```
+      
+---
 ## License
 
 This project is licensed under the **MIT License**.
