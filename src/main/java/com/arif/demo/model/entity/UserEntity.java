@@ -1,5 +1,6 @@
 package com.arif.demo.model.entity;
 
+import com.arif.demo.model.web.credential.SignUpRequestDto;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
@@ -31,12 +32,24 @@ public class UserEntity extends BaseEntity {
     @Column("PASSWORD_HASH")
     private String passwordHash;
 
-    public static UserEntity of(String username, String passwordHash) {
+    @Column("NAME")
+    private String name;
+
+    @Column("SURNAME")
+    private String surname;
+
+    @Column("TCKN")
+    private String tckn;
+
+    public static UserEntity of(SignUpRequestDto request, String passwordHash) {
         var created = LocalDateTime.now();
         return UserEntity.builder()
                 .userKey(UUID.randomUUID().toString())
-                .username(username)
+                .username(request.username())
                 .passwordHash(passwordHash)
+                .name(request.name())
+                .surname(request.surname())
+                .tckn(request.tckn())
                 .created(created)
                 .updated(created)
                 .build();

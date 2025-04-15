@@ -18,6 +18,15 @@
             <column name="USERNAME" type="varchar(250)">
                 <constraints nullable="false" unique="true" uniqueConstraintName="unique_cons_user_username"/>
             </column>
+            <column name="NAME" type="varchar(250)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SURNAME" type="varchar(250)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TCKN" type="varchar(250)">
+                <constraints nullable="false"/>
+            </column>
             <column name="PASSWORD_HASH" type="varchar(1024)">
                 <constraints nullable="false"/>
             </column>
@@ -74,6 +83,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="TRANSACTION_STATUS" type="varchar(125)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="OPPOSITE_PARTY_TYPE" type="varchar(125)">
                 <constraints nullable="false"/>
             </column>
             <column name="AMOUNT" type="numeric(30,10)" defaultValue="0">

@@ -33,7 +33,7 @@ class UserServiceImplTest {
         when(tokenUtil.getUserKey()).thenReturn(Mono.just(userKey));
         when(userRepository.findByUserKey(anyString())).thenReturn(Mono.just(userEntity));
 
-        Mono<GetUserResponseDto> result = userService.getUser();
+        Mono<GetUserResponseDto> result = userService.getUserInfo();
 
         StepVerifier.create(result)
                 .expectNext(expectedResponse)
@@ -47,7 +47,7 @@ class UserServiceImplTest {
         when(tokenUtil.getUserKey()).thenReturn(Mono.just(userKey));
         when(userRepository.findByUserKey(anyString())).thenReturn(Mono.empty());
 
-        Mono<GetUserResponseDto> result = userService.getUser();
+        Mono<GetUserResponseDto> result = userService.getUserInfo();
 
         StepVerifier.create(result)
                 .verifyComplete();
@@ -57,7 +57,7 @@ class UserServiceImplTest {
     void getUser_whenTokenFails_returnsError() {
         when(tokenUtil.getUserKey()).thenReturn(Mono.error(new RuntimeException("Token error")));
 
-        Mono<GetUserResponseDto> result = userService.getUser();
+        Mono<GetUserResponseDto> result = userService.getUserInfo();
 
         StepVerifier.create(result)
                 .expectErrorMatches(throwable -> throwable instanceof RuntimeException && throwable.getMessage().equals("Token error"))

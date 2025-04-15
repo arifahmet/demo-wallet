@@ -1,7 +1,11 @@
 package com.arif.demo.model.web.transaction;
 
+import com.arif.demo.model.enums.OppositePartyTypeEnum;
 import com.arif.demo.model.enums.TransactionTypeEnum;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -12,6 +16,8 @@ public class CreateTransactionRequestDto {
     private String walletName;
     @NotNull
     private TransactionTypeEnum transactionType;
+    @NotNull
+    private OppositePartyTypeEnum oppositePartyType;
     @DecimalMin(value = "0.01")
     @Digits(integer = 10, fraction = 2)
     @NotNull

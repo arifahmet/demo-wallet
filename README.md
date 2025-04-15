@@ -118,18 +118,37 @@ Kafka is setup with a `docker-compose.yaml` file in the `kafka` directory.
   ```json
   [
     {
-      "walletName": "test_wallet",
-      "transactionKey": "021afc16-037a-4c38-8e20-111ca320a331",
-      "transactionType": "DEPOSIT",
-      "transactionStatus": "APPROVED",
-      "amount": 100.00
+        "walletName": "test_wallet",
+        "transactionKey": "c8bf8f40-bb7c-4767-b6d9-77aa4084ed4f",
+        "transactionType": "DEPOSIT",
+        "transactionStatus": "APPROVED",
+        "oppositePartyType": "IBAN",
+        "amount": "1000.00",
+        "description": null,
+        "created": "2025-04-15 06:58:07",
+        "statusChangeTime": "2025-04-15 06:58:19"
     },
     {
-      "walletName": "test_wallet",
-      "transactionKey": "4edc261a-a640-4d2f-bd62-0543200fbb07",
-      "transactionType": "WITHDRAW",
-      "transactionStatus": "APPROVED",
-      "amount": 50.00
+        "walletName": "test_wallet",
+        "transactionKey": "286e01ed-7a47-4307-b863-993947f92c4e",
+        "transactionType": "DEPOSIT",
+        "transactionStatus": "APPROVED",
+        "oppositePartyType": "IBAN",
+        "amount": "1000.00",
+        "description": null,
+        "created": "2025-04-15 06:58:41",
+        "statusChangeTime": "2025-04-15 06:58:53"
+    },
+    {
+        "walletName": "test_wallet",
+        "transactionKey": "9d76a96a-7ecb-4b12-bdcf-738222d37719",
+        "transactionType": "WITHDRAW",
+        "transactionStatus": "APPROVED",
+        "oppositePartyType": "BANK_ACCOUNT",
+        "amount": "1001.00",
+        "description": null,
+        "created": "2025-04-15 07:00:06",
+        "statusChangeTime": "2025-04-15 07:00:30"
     }
   ]
   ```
@@ -139,11 +158,14 @@ Kafka is setup with a `docker-compose.yaml` file in the `kafka` directory.
 - **Endpoint**: `/api/v1/transaction`
 - **Method**: `POST`
 - **Summary**: Initiates a transaction.
+- **transactionType**: `DEPOSIT`, `WITHDRAW`
+- **oppositePartyType**: `IBAN`, `BANK_ACCOUNT`
 - **Request Body Example**:
   ```json
   {
     "walletName": "test_wallet",
     "transactionType": "WITHDRAW",
+    "oppositePartyType": "BANK_ACCOUNT",
     "amount": 1001
   }
   ```
@@ -187,8 +209,11 @@ Kafka is setup with a `docker-compose.yaml` file in the `kafka` directory.
 - **Example Response**:
   ```json
   {
+    "userKey": "1992c9fb-b0e8-416f-a1d9-ad5355507ed0",
     "username": "test_user",
-    "userKey": "f3bce47d-43e2-4715-b3d6-8ef979c9d675"
+    "name": "Arif",
+    "surname": "Halıcı",
+    "tckn": "11111111111"
   }
   ```
 
@@ -224,7 +249,10 @@ Kafka is setup with a `docker-compose.yaml` file in the `kafka` directory.
   ```json
   {
     "username":"test_user",
-    "password":"123456"
+    "password":"123456",
+    "name": "Arif",
+    "surname": "Halıcı",
+    "tckn": "11111111111"
   }
   ```
 ---

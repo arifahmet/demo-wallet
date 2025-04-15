@@ -1,7 +1,7 @@
 package com.arif.demo.security;
 
-import com.arif.demo.exception.TokenSerializationException;
-import com.arif.demo.exception.UnauthorizedException;
+import com.arif.demo.exception.model.TokenSerializationException;
+import com.arif.demo.exception.model.UnauthorizedException;
 import com.arif.demo.security.model.JwtToken;
 import com.arif.demo.security.model.TokenTypeEnum;
 import com.arif.demo.security.properties.JwtProperties;

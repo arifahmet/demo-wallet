@@ -17,7 +17,10 @@ public class CredentialExampleModels {
     public static final String SIGN_UP_USER_REQUEST = """
             {
                  "username":"test_user",
-                 "password":"123456"
+                 "password":"123456",
+                 "name": "Arif",
+                 "surname": "Halıcı",
+                 "tckn": "11111111111"
             }""";
     public static final String SING_UP_USER_RESPONSE = """
             {

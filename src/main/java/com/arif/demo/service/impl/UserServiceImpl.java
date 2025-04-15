@@ -1,5 +1,6 @@
 package com.arif.demo.service.impl;
 
+import com.arif.demo.exception.model.UnauthorizedException;
 import com.arif.demo.model.entity.UserEntity;
 import com.arif.demo.model.web.user.GetUserResponseDto;
 import com.arif.demo.repository.UserRepository;
@@ -23,12 +24,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<UserEntity> getUserByUserKey(String userKey) {
-        return userRepository.findByUserKey(userKey);
+        return userRepository.findByUserKey(userKey).switchIfEmpty(Mono.error(new UnauthorizedException("Forbidden")));
     }
 
     @Override
-    public Mono<GetUserResponseDto> getUser() {
-        return tokenUtil.getUserKey().flatMap(userRepository::findByUserKey).map(GetUserResponseDto::of);
+    public Mono<GetUserResponseDto> getUserInfo() {
+        return getUser().map(GetUserResponseDto::of);
+    }
+
+    @Override
+    public Mono<UserEntity> getUser() {
+        return tokenUtil.getUserKey().flatMap(userRepository::findByUserKey)
+                .switchIfEmpty(Mono.error(new UnauthorizedException("Forbidden")));
     }
 
     @Override

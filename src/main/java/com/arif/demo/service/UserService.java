@@ -10,7 +10,9 @@ public interface UserService {
 
     Mono<UserEntity> getUserByUserKey(String userKey);
 
-    Mono<GetUserResponseDto> getUser();
+    Mono<GetUserResponseDto> getUserInfo();
+
+    Mono<UserEntity> getUser();
 
     Mono<UserEntity> save(UserEntity user);
 }

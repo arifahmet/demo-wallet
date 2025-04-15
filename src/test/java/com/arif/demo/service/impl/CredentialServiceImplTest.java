@@ -1,6 +1,6 @@
 package com.arif.demo.service.impl;
 
-import com.arif.demo.exception.UnauthorizedException;
+import com.arif.demo.exception.model.UnauthorizedException;
 import com.arif.demo.model.entity.UserEntity;
 import com.arif.demo.model.web.credential.SignInRequestDto;
 import com.arif.demo.model.web.credential.SignInResponseDto;

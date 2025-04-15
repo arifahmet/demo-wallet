@@ -7,13 +7,20 @@ import lombok.Data;
 @Data
 @Builder
 public class GetUserResponseDto {
-    private String username;
     private String userKey;
+    private String username;
+    private String name;
+    private String surname;
+    private String tckn;
+
 
     public static GetUserResponseDto of(UserEntity userEntity) {
         return GetUserResponseDto.builder()
                 .username(userEntity.getUsername())
                 .userKey(userEntity.getUserKey())
+                .name(userEntity.getName())
+                .surname(userEntity.getSurname())
+                .tckn(userEntity.getTckn())
                 .build();
     }
 }

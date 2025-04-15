@@ -1,5 +1,7 @@
 package com.arif.demo.service.impl;
 
+import com.arif.demo.exception.model.TransactionAllreadyCompletedException;
+import com.arif.demo.exception.model.TransactionNotFoundException;
 import com.arif.demo.model.entity.TransactionEntity;
 import com.arif.demo.model.entity.WalletEntity;
 import com.arif.demo.model.enums.TransactionStatusEnum;
@@ -11,8 +13,8 @@ import com.arif.demo.model.web.transaction.CreateTransactionRequestDto;
 import com.arif.demo.model.web.transaction.TransactionResponseDto;
 import com.arif.demo.model.web.transaction.UserTransactionResponseDto;
 import com.arif.demo.repository.TransactionRepository;
-import com.arif.demo.security.TokenUtil;
 import com.arif.demo.service.TransactionService;
+import com.arif.demo.service.UserService;
 import com.arif.demo.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
@@ -25,6 +27,7 @@ import reactor.kafka.receiver.ReceiverRecord;
 import reactor.kafka.sender.SenderResult;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
@@ -34,13 +37,13 @@ public class TransactionServiceImpl implements TransactionService {
     public BigDecimal transactionLimit;
     private final TransactionRepository transactionRepository;
     private final WalletService walletService;
-    private final TokenUtil tokenUtil;
+    private final UserService userService;
     private final ReactiveKafkaProducerTemplate<String, TransactionEvent> transactionProducerTemplate;
 
     @Override
     public Flux<UserTransactionResponseDto> getUserTransactions(String walletName, TransactionStatusEnum status, TransactionTypeEnum transactionType) {
-        return tokenUtil.getUserKey().flatMapMany(userKey ->
-                transactionRepository.findUserTransactions(userKey, walletName, status, transactionType));
+        return userService.getUserInfo().flatMapMany(user ->
+                transactionRepository.findUserTransactions(user.getUserKey(), walletName, status, transactionType));
     }
 
     @Override
@@ -53,16 +56,23 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Void> changeTransactionStatus(ChangeTransactionStatusRequestDto changeTransactionStatusRequest) {
         return validateChangeTransactionStatusRequest(changeTransactionStatusRequest)
-                .then(transactionRepository.findByTransactionKey(changeTransactionStatusRequest.getTransactionKey()).flatMap(transaction ->
-                        walletService.getUserWalletById(transaction.getWalletId()).flatMap(wallet ->
-                        {
-                            if (isTransactionProceedBefore(transaction.getTransactionStatus())) {
-                                return Mono.error(new NotImplementedException("Transaction already processed"));
-                            }
-                            var event = TransactionEvent.of(transaction, wallet, changeTransactionStatusRequest.getTransactionStatus());
-                            return transactionProducerTemplate.send(Topics.TRANSACTION_EVENT.name(), wallet.getWalletName(), event)
-                                    .flatMap(this::checkSenderResultException);
-                        }))).then();
+                .then(userService.getUser().flatMap(userEntity ->
+                        transactionRepository.findTransaction(userEntity.getUserKey(), changeTransactionStatusRequest.getTransactionKey())
+                                .switchIfEmpty(Mono.error(new TransactionNotFoundException()))
+                                .flatMap(transaction -> checkTransactionAndSentEvent(changeTransactionStatusRequest, transaction))))
+                .then();
+    }
+
+    private Mono<SenderResult<Void>> checkTransactionAndSentEvent(ChangeTransactionStatusRequestDto changeTransactionStatusRequest, TransactionEntity transaction) {
+        return walletService.getUserWalletById(transaction.getWalletId()).flatMap(wallet ->
+        {
+            if (isTransactionProceedBefore(transaction.getTransactionStatus())) {
+                return Mono.error(new TransactionAllreadyCompletedException());
+            }
+            var event = TransactionEvent.of(transaction, wallet, changeTransactionStatusRequest.getTransactionStatus());
+            return transactionProducerTemplate.send(Topics.TRANSACTION_EVENT.name(), wallet.getWalletName(), event)
+                    .flatMap(this::checkSenderResultException);
+        });
     }
 
     private Mono<Void> validateChangeTransactionStatusRequest(ChangeTransactionStatusRequestDto transactionRequest) {
@@ -81,6 +91,7 @@ public class TransactionServiceImpl implements TransactionService {
                 return Mono.error(new NotImplementedException("Transaction already processed"));
             }
             transaction.setTransactionStatus(receiverRecord.value().getTransactionStatus());
+            transaction.setStatusChangeTime(LocalDateTime.now());
             return processTransaction(transaction);
         }).then();
     }
@@ -115,6 +126,7 @@ public class TransactionServiceImpl implements TransactionService {
     private Mono<TransactionEntity> handleTransactionError(TransactionEntity transaction, Throwable error) {
         transaction.setTransactionStatus(TransactionStatusEnum.FAILED);
         transaction.setDescription(error.getMessage());
+        transaction.setStatusChangeTime(LocalDateTime.now());
         return Mono.empty();
     }
 

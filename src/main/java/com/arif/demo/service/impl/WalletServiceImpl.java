@@ -1,8 +1,7 @@
 package com.arif.demo.service.impl;
 
-import com.arif.demo.exception.InsufficientBalanceException;
-import com.arif.demo.exception.UnauthorizedException;
-import com.arif.demo.exception.WalletNotFoundException;
+import com.arif.demo.exception.model.InsufficientBalanceException;
+import com.arif.demo.exception.model.WalletNotFoundException;
 import com.arif.demo.model.entity.TransactionEntity;
 import com.arif.demo.model.entity.WalletEntity;
 import com.arif.demo.model.enums.TransactionStatusEnum;
@@ -10,7 +9,6 @@ import com.arif.demo.model.enums.TransactionTypeEnum;
 import com.arif.demo.model.web.wallet.CreateWalletRequestDto;
 import com.arif.demo.model.web.wallet.GetUserWalletResponseDto;
 import com.arif.demo.repository.WalletRepository;
-import com.arif.demo.security.TokenUtil;
 import com.arif.demo.service.UserService;
 import com.arif.demo.service.WalletService;
 import lombok.RequiredArgsConstructor;
@@ -25,27 +23,25 @@ import java.math.BigDecimal;
 public class WalletServiceImpl implements WalletService {
     private final WalletRepository walletRepository;
     private final UserService userService;
-    private final TokenUtil tokenUtil;
 
     @Override
     public Mono<Void> createWallet(CreateWalletRequestDto createWalletRequest) {
-        return tokenUtil.getUserKey().flatMap(userService::getUserByUserKey)
-                .switchIfEmpty(Mono.error(new UnauthorizedException("User not found")))
-                .flatMap(user -> walletRepository.save(WalletEntity.of(user, createWalletRequest)))
-                .then();
+        return userService.getUser().flatMap(user ->
+                walletRepository.save(WalletEntity.of(user, createWalletRequest))).then();
     }
 
     @Override
     public Flux<GetUserWalletResponseDto> getUserWallets() {
-        return tokenUtil.getUserKey()
-                .flatMapMany(walletRepository::findUserWallets)
+        return userService.getUser()
+                .flatMapMany(userEntity -> walletRepository.findUserWallets(userEntity.getUserKey()))
                 .map(GetUserWalletResponseDto::of);
     }
 
     @Override
     public Mono<WalletEntity> getUserWalletByName(String walletName) {
-        return tokenUtil.getUserKey()
-                .flatMap(userKey -> walletRepository.findWallet(userKey, walletName));
+        return userService.getUser()
+                .flatMap(userEntity -> walletRepository.findWallet(userEntity.getUserKey(), walletName))
+                .switchIfEmpty(Mono.error(new WalletNotFoundException()));
     }
 
     @Override

@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 public class UserExampleModels {
     public static final String GET_USER_RESPONSE = """
             {
+                 "userKey": "1992c9fb-b0e8-416f-a1d9-ad5355507ed0",
                  "username": "test_user",
-                 "userKey": "f3bce47d-43e2-4715-b3d6-8ef979c9d675"
+                 "name": "Arif",
+                 "surname": "Halıcı",
+                 "tckn": "11111111111"
             }""";
 }

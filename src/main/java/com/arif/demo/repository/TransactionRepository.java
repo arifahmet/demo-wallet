@@ -15,8 +15,10 @@ public interface TransactionRepository extends ReactiveCrudRepository<Transactio
                    t.TRANSACTION_KEY,
                    t.TRANSACTION_TYPE,
                    t.TRANSACTION_STATUS,
+                   t.OPPOSITE_PARTY_TYPE,
                    t.AMOUNT,
                    t.DESCRIPTION,
+                   t.CREATED,
                    t.STATUS_CHANGE_TIME
             FROM dm_user u,
                  dm_wallet w,
@@ -29,6 +31,18 @@ public interface TransactionRepository extends ReactiveCrudRepository<Transactio
               AND (t.TRANSACTION_TYPE = :transactionType OR :transactionType IS NULL)
             """)
     Flux<UserTransactionResponseDto> findUserTransactions(String userKey, String walletName, TransactionStatusEnum status, TransactionTypeEnum transactionType);
+
+    @Query("""
+            SELECT t.*
+            FROM dm_user u,
+                 dm_wallet w,
+                 dm_transaction t
+            WHERE u.USER_KEY = :userKey
+              AND w.USER_ID = u.ID
+              AND t.WALLET_ID = w.ID
+              AND t.TRANSACTION_KEY = :transactionKey
+            """)
+    Mono<TransactionEntity> findTransaction(String userKey, String transactionKey);
 
     Mono<TransactionEntity> findByTransactionKey(String transactionKey);
 }

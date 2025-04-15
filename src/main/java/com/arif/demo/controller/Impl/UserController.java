@@ -15,7 +15,7 @@ public class UserController implements UserOperation {
 
     @Override
     public Mono<GetUserResponseDto> getUser() {
-        return userService.getUser();
+        return userService.getUserInfo();
     }
 }
 

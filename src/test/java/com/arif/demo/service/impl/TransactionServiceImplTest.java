@@ -1,6 +1,6 @@
 package com.arif.demo.service.impl;
 
-import com.arif.demo.exception.WalletNotFoundException;
+import com.arif.demo.exception.model.WalletNotFoundException;
 import com.arif.demo.model.entity.TransactionEntity;
 import com.arif.demo.model.entity.WalletEntity;
 import com.arif.demo.model.enums.TransactionStatusEnum;

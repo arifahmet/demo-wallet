@@ -1,5 +1,6 @@
 package com.arif.demo.model.entity;
 
+import com.arif.demo.model.enums.OppositePartyTypeEnum;
 import com.arif.demo.model.enums.TransactionStatusEnum;
 import com.arif.demo.model.enums.TransactionTypeEnum;
 import com.arif.demo.model.web.transaction.CreateTransactionRequestDto;
@@ -34,13 +35,15 @@ public class TransactionEntity extends BaseEntity {
     private TransactionTypeEnum transactionType;
     @Column("TRANSACTION_STATUS")
     private TransactionStatusEnum transactionStatus;
+    @Column("OPPOSITE_PARTY_TYPE")
+    private OppositePartyTypeEnum oppositePartyType;
     @Column("AMOUNT")
     private BigDecimal amount;
     @Column("DESCRIPTION")
     private String description;
     @CreatedDate
     @Column("STATUS_CHANGE_TIME")
-    private LocalDateTime statusChangedAt;
+    private LocalDateTime statusChangeTime;
 
 
     public static TransactionEntity of(
@@ -53,8 +56,9 @@ public class TransactionEntity extends BaseEntity {
                 .transactionKey(UUID.randomUUID().toString())
                 .transactionType(transactionRequest.getTransactionType())
                 .transactionStatus(TransactionStatusEnum.PENDING)
+                .oppositePartyType(transactionRequest.getOppositePartyType())
                 .amount(transactionRequest.getAmount())
-                .statusChangedAt(null)
+                .statusChangeTime(null)
                 .description(description)
                 .created(created)
                 .updated(created)
