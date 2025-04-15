@@ -2,6 +2,7 @@ package com.arif.demo.controller;
 
 import com.arif.demo.controller.example.model.WalletExampleModels;
 import com.arif.demo.model.web.user.GetUserResponseDto;
+import com.arif.demo.model.web.wallet.ChanceShoppingStatusRequestDto;
 import com.arif.demo.model.web.wallet.ChanceWithdrawStatusRequestDto;
 import com.arif.demo.model.web.wallet.CreateWalletRequestDto;
 import com.arif.demo.model.web.wallet.GetUserWalletResponseDto;
@@ -61,4 +62,17 @@ public interface WalletOperation {
                                     summary = "Change Withdraw Status Request Model")},
                             schema = @Schema(implementation = CreateWalletRequestDto.class))}))
     Mono<Void> createWallet(@RequestBody @Valid ChanceWithdrawStatusRequestDto request);
+
+    @PostMapping("/shopping-status")
+    @Operation(summary = "Change shopping active status",
+            description = "Change wallet shopping status.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Change Shopping Status Request Body",
+                    required = true,
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            examples = {@ExampleObject(name = "Change Shopping Status Request",
+                                    value = WalletExampleModels.CHANGE_WALLET_SHOPPING_STATUS_REQUEST,
+                                    summary = "Change Shopping Status Request Model")},
+                            schema = @Schema(implementation = ChanceShoppingStatusRequestDto.class))}))
+    Mono<Void> chanceShoppingStatus(@RequestBody @Valid ChanceShoppingStatusRequestDto request);
 }

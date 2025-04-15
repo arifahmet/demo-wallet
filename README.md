@@ -127,6 +127,19 @@ Kafka and Postgres is setup with a `docker-compose.yaml` file in the `kafka` dir
   }
   ```
 
+#### Change Wallet Shopping Active Status
+
+- **Endpoint**: `/api/v1/wallet/shopping-status`
+- **Method**: `POST`
+- **Summary**: Wallet shopping active status changer.
+- **Request Body Example**:
+  ```json
+  {
+    "walletName": "test_wallet",
+    "activeForShopping": true
+  }
+  ```
+
 ---
 
 ### Transaction Management

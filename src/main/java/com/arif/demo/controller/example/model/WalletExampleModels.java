@@ -39,4 +39,9 @@ public class WalletExampleModels {
                 "walletName": "test_wallet",
                 "activeForWithdraw": false
             }""";
+    public static final String CHANGE_WALLET_SHOPPING_STATUS_REQUEST = """
+            {
+                "walletName": "test_wallet",
+                "activeForShopping": true
+            }""";
 }

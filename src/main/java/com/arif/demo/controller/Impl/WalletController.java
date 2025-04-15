@@ -1,6 +1,7 @@
 package com.arif.demo.controller.Impl;
 
 import com.arif.demo.controller.WalletOperation;
+import com.arif.demo.model.web.wallet.ChanceShoppingStatusRequestDto;
 import com.arif.demo.model.web.wallet.ChanceWithdrawStatusRequestDto;
 import com.arif.demo.model.web.wallet.CreateWalletRequestDto;
 import com.arif.demo.model.web.wallet.GetUserWalletResponseDto;
@@ -29,6 +30,11 @@ public class WalletController implements WalletOperation {
     @Override
     public Mono<Void> createWallet(ChanceWithdrawStatusRequestDto request) {
         return walletService.chanceWithdrawStatus(request);
+    }
+
+    @Override
+    public Mono<Void> chanceShoppingStatus(ChanceShoppingStatusRequestDto request) {
+        return walletService.chanceShoppingStatus(request);
     }
 }
 

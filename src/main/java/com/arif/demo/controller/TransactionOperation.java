@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +52,7 @@ public interface TransactionOperation {
                     example = "DEPOSIT",
                     schema = @Schema(implementation = TransactionTypeEnum.class))
     })
-    Flux<UserTransactionResponseDto> getUserTransactions(@RequestParam(required = false) String walletName,
+    Flux<UserTransactionResponseDto> getUserTransactions(@RequestParam(required = false) @Valid @Size(max = 250) String walletName,
                                                          @RequestParam(required = false) TransactionStatusEnum status,
                                                          @RequestParam(required = false) TransactionTypeEnum transactionType);
 
