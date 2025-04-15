@@ -25,12 +25,13 @@ import reactor.kafka.receiver.ReceiverRecord;
 import reactor.kafka.sender.SenderResult;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
     @Value("${transaction-limit:1000}")
-    public int transactionLimit;
+    public BigDecimal transactionLimit;
     private final TransactionRepository transactionRepository;
     private final WalletService walletService;
     private final TokenUtil tokenUtil;
@@ -54,14 +55,14 @@ public class TransactionServiceImpl implements TransactionService {
         return validateChangeTransactionStatusRequest(changeTransactionStatusRequest)
                 .then(transactionRepository.findByTransactionKey(changeTransactionStatusRequest.getTransactionKey()).flatMap(transaction ->
                         walletService.getUserWalletById(transaction.getWalletId()).flatMap(wallet ->
-                {
-                    if (isTransactionProceedBefore(transaction.getTransactionStatus())) {
-                        return Mono.error(new NotImplementedException("Transaction already processed"));
-                    }
-                    var event = TransactionEvent.of(transaction, wallet, changeTransactionStatusRequest.getTransactionStatus());
-                    return transactionProducerTemplate.send(Topics.TRANSACTION_EVENT.name(), wallet.getWalletName(), event)
-                            .flatMap(this::checkSenderResultException);
-                }))).then();
+                        {
+                            if (isTransactionProceedBefore(transaction.getTransactionStatus())) {
+                                return Mono.error(new NotImplementedException("Transaction already processed"));
+                            }
+                            var event = TransactionEvent.of(transaction, wallet, changeTransactionStatusRequest.getTransactionStatus());
+                            return transactionProducerTemplate.send(Topics.TRANSACTION_EVENT.name(), wallet.getWalletName(), event)
+                                    .flatMap(this::checkSenderResultException);
+                        }))).then();
     }
 
     private Mono<Void> validateChangeTransactionStatusRequest(ChangeTransactionStatusRequestDto transactionRequest) {
@@ -90,26 +91,31 @@ public class TransactionServiceImpl implements TransactionService {
 
     private Mono<TransactionEntity> createAndProcessTransaction(WalletEntity walletEntity,
                                                                 CreateTransactionRequestDto transactionRequest) {
-        var transactionStatus = getTransactionStatus(transactionRequest);
-        var newTransaction = TransactionEntity.of(transactionStatus, walletEntity, transactionRequest, null);
+        var newTransaction = TransactionEntity.of(walletEntity, transactionRequest, null);
         return processTransaction(newTransaction);
     }
 
     private Mono<TransactionEntity> processTransaction(TransactionEntity transaction) {
         return walletService.changeUserWalletBalance(transaction)
-                .onErrorResume(error -> handleTransactionError(transaction, error).then())
-                .then(saveTransaction(transaction));
+                .onErrorResume(error -> handleTransactionError(transaction, error).thenReturn(new WalletEntity()))
+                .flatMap(wallet -> saveTransaction(transaction)
+                        .flatMap(savedTransaction -> checkAutoProcesseTransaction(wallet, savedTransaction)));
+    }
+
+    private Mono<TransactionEntity> checkAutoProcesseTransaction(WalletEntity wallet, TransactionEntity savedTransaction) {
+        if (Objects.nonNull(wallet.getId()) && savedTransaction.getTransactionStatus().equals(TransactionStatusEnum.PENDING)
+                && savedTransaction.getAmount().compareTo(transactionLimit) <= 0) {
+            var event = TransactionEvent.of(savedTransaction, wallet, TransactionStatusEnum.APPROVED);
+            return transactionProducerTemplate.send(Topics.TRANSACTION_EVENT.name(), wallet.getWalletName(), event)
+                    .flatMap(this::checkSenderResultException).thenReturn(savedTransaction);
+        }
+        return Mono.just(savedTransaction);
     }
 
     private Mono<TransactionEntity> handleTransactionError(TransactionEntity transaction, Throwable error) {
         transaction.setTransactionStatus(TransactionStatusEnum.FAILED);
         transaction.setDescription(error.getMessage());
         return Mono.empty();
-    }
-
-    private TransactionStatusEnum getTransactionStatus(CreateTransactionRequestDto transactionRequest) {
-        return transactionRequest.getAmount().compareTo(BigDecimal.valueOf(transactionLimit)) < 0 ?
-                TransactionStatusEnum.APPROVED : TransactionStatusEnum.PENDING;
     }
 
     private boolean isTransactionProceedBefore(TransactionStatusEnum transactionStatus) {

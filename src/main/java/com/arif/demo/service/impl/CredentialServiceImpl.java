@@ -1,12 +1,13 @@
 package com.arif.demo.service.impl;
 
+import com.arif.demo.exception.UnauthorizedException;
 import com.arif.demo.model.entity.UserEntity;
 import com.arif.demo.model.web.credential.SignInRequestDto;
 import com.arif.demo.model.web.credential.SignInResponseDto;
-import com.arif.demo.model.web.credential.SignUpResponseDto;
 import com.arif.demo.model.web.credential.SignUpRequestDto;
-import com.arif.demo.security.model.TokenTypeEnum;
+import com.arif.demo.model.web.credential.SignUpResponseDto;
 import com.arif.demo.security.TokenUtil;
+import com.arif.demo.security.model.TokenTypeEnum;
 import com.arif.demo.service.CredentialService;
 import com.arif.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +29,8 @@ public class CredentialServiceImpl implements CredentialService {
                 return Mono.error(new Exception("Username and Password not match"));
             }
             var accessToken = tokenUtil.createToken(user.getUserKey(), TokenTypeEnum.ACCESS);
-            var refreshToken = tokenUtil.createToken(user.getUserKey(), TokenTypeEnum.ACCESS);
-            return Mono.just(new SignInResponseDto(accessToken, refreshToken));
-        });
+            return Mono.just(new SignInResponseDto(accessToken));
+        }).switchIfEmpty(Mono.error(new UnauthorizedException("Username and Password not match")));
     }
 
     @Override

@@ -7,13 +7,12 @@ import lombok.NoArgsConstructor;
 public class CredentialExampleModels {
     public static final String SIGN_IN_REQUEST = """
             {
-                "username":"arif",
-                "password":"test12"
+                 "username":"test_user",
+                 "password":"123456"
             }""";
     public static final String SIGN_IN_RESPONSE = """
             {
-              "accessToken": " ",
-              "refreshToken": " "
+              "accessToken": "<jwt_token>>"
             }""";
     public static final String SIGN_UP_USER_REQUEST = """
             {
@@ -22,7 +21,7 @@ public class CredentialExampleModels {
             }""";
     public static final String SING_UP_USER_RESPONSE = """
             {
-                 "userName": "arif",
-                 "userKey": "82638e6b-75d9-4ee4-a213-cc9f190500f8"
+                 "userName": "test_user",
+                 "userKey": "f3bce47d-43e2-4715-b3d6-8ef979c9d675"
             }""";
 }

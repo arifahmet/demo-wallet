@@ -32,7 +32,7 @@ public interface WalletRepository extends ReactiveCrudRepository<WalletEntity, L
     @Modifying
     @Query("""
             UPDATE dm_wallet
-            SET USABLE_BALANCE= USABLE_BALANCE + :usableMountChange, BLOCKED_BALANCE = BLOCKED_BALANCE - :blockAmountChange
+            SET USABLE_BALANCE= USABLE_BALANCE + :usableMountChange, BLOCKED_BALANCE = BLOCKED_BALANCE + :blockAmountChange
             WHERE ID = :walletId
             """)
     Mono<Void> changeBalance(Long walletId, BigDecimal usableMountChange, BigDecimal blockAmountChange);

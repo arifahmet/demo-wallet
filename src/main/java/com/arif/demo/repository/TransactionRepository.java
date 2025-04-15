@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 public interface TransactionRepository extends ReactiveCrudRepository<TransactionEntity, Long> {
     @Query("""
             SELECT w.WALLET_NAME,
+                   t.TRANSACTION_KEY,
                    t.TRANSACTION_TYPE,
                    t.TRANSACTION_STATUS,
                    t.AMOUNT,

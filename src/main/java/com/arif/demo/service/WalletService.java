@@ -15,7 +15,7 @@ public interface WalletService {
 
     Mono<WalletEntity> getUserWalletByName(String walletName);
 
-    Mono<Void> changeUserWalletBalance(TransactionEntity transaction);
+    Mono<WalletEntity> changeUserWalletBalance(TransactionEntity transaction);
 
     Mono<WalletEntity> getUserWalletById(Long walletId);
 }

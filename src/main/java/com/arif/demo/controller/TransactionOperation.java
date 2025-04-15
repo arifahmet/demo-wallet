@@ -72,7 +72,7 @@ public interface TransactionOperation {
                     content = {@Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             examples = {@ExampleObject(name = "Created Transaction Info Response",
-                                    value = TransactionExampleModels.GET_CREATE_TRANSACTIONS_RESPONSE,
+                                    value = TransactionExampleModels.TRANSACTIONS_RESPONSE,
                                     summary = "Created Transaction Info Response Model")},
                             schema = @Schema(implementation = TransactionResponseDto.class))})})
     Mono<TransactionResponseDto> createTransaction(@RequestBody @Valid CreateTransactionRequestDto transactionRequest);

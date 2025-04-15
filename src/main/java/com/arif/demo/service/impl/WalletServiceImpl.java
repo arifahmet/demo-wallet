@@ -49,15 +49,15 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public Mono<Void> changeUserWalletBalance(TransactionEntity transactionEntity) {
+    public Mono<WalletEntity> changeUserWalletBalance(TransactionEntity transactionEntity) {
         return walletRepository.findById(transactionEntity.getWalletId()).flatMap(walletEntity -> {
             if (hasSufficientUsableBalance(walletEntity, transactionEntity)) {
                 var usableAmountChange = getUsableAmountChange(transactionEntity);
                 var blockAmountChange = getBlockAmountChange(transactionEntity);
-                return walletRepository.changeBalance(walletEntity.getId(), usableAmountChange, blockAmountChange);
+                return walletRepository.changeBalance(walletEntity.getId(), usableAmountChange, blockAmountChange).thenReturn(walletEntity);
             }
             return Mono.error(new InsufficientBalanceException());
-        }).then();
+        });
     }
 
     @Override

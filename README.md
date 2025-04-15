@@ -4,182 +4,215 @@ This project is a **Spring Boot** application designed for managing transactions
 
 ## Features
 
-- **Transaction Management**
-   - Create and process transactions (DEPOSIT/WITHDRAW).
-   - Transactions under the configured limit are automatically approved.
-   - Transactions exceeding the limit are flagged as "PENDING" and require user action to approve or reject.
-   - Retrieve user transactions based on specific filters (e.g., status or type).
+- **Wallet Management**: Create and manage wallets with various currencies, track balances.
+- **Transaction Management**:
+  - Handle DEPOSIT and WITHDRAW operations.
+  - Transactions below the configured limit are automatically approved.
+  - Transactions above the limit are flagged as "PENDING" for further action.
+- **User Management**: Provides user-related details and operations.
+- **Credential Management**: Authentication operations using username/password.
+- **Reactive Design**: Built using **Spring WebFlux**, enabling asynchronous and non-blocking operations.
+- **Kafka Integration**: Producess and consumes Kafka topics for event-based workflows.
 
-- **Reactive Design**
-   - Built using **Spring WebFlux**, enabling asynchronous and non-blocking operations.
-   - Highly scalable for handling large transaction loads.
+### OpenAPI & Swagger Integration
 
-- **Kafka Event Handling**
-   - Listens to Kafka topics for transaction-related events.
-   - Publishes events for downstream processing.
+Swagger is integrated for API documentation and testing.
 
-- **Dockerized Kafka Setup**
-   - Quickly set up a Kafka instance using Docker Compose for local development and testing.
+**Swagger URL**: [Swagger UI](http://localhost:8044/webjars/swagger-ui/index.html)
 
-- **Validation**
-   - Enforces a configurable transaction limit for auto-approval.
-   - Supports custom validation rules for status changes and transaction operations.
+---
 
 ## Technologies Used
 
 - **Java 17** (Project Codebase)
-- **Spring Boot** (Core Framework)
+- **Spring Boot** (Framework)
 - **Spring WebFlux** (Reactive programming)
-- **Reactive Kafka** (Event-driven transaction handling)
-- **Lombok** (For reducing boilerplate code)
-- **Jakarta EE** (Imports for modern Java enterprise development)
-- **Docker & Docker Compose** (For running Kafka)
+- **Reactive Kafka** (Kafka event-handling)
+- **Lombok** (Reduce boilerplate code)
+- **Docker Compose** (Setup Kafka environments)
 
 ---
 
 ## How to Run Kafka Locally with Docker Compose
 
-This project includes a `docker-compose.yaml` file in the `kafka` folder to quickly set up a local **Kafka**
-environment.
+Kafka is setup with a `docker-compose.yaml` file in the `kafka` directory.
 
-1. Navigate to the `kafka` directory in the project:
+1. Navigate to the `kafka` folder.
    ```bash
    cd kafka
    ```
-
-2. Start Kafka using Docker Compose:
+2. Start Kafka.
    ```bash
    docker-compose up
    ```
-   This will start the Kafka broker and ZooKeeper services.
-
-3. Verify Kafka is running:
-   - Kafka should now be running locally on port `9092`.
-   - Kafka topics will be automatically created as required by the application.
-
-4. Stop Kafka when done:
+3. Verify Kafka locally on port `9092`.
+4. Stop Kafka when done.
    ```bash
    docker-compose down
    ```
 
 ---
 
-## API Endpoints
+## Using the APIs
 
-### Transaction Management APIs
+### Wallet Management
 
-1. **Create Transaction**
-   - **POST** `/transactions/create`
-   - Request Body (Example from `TransactionExampleModels.createTransactionRequest`):
-     ```json
-     {
-       "walletId": "12345",
-       "amount": 100.00,
-       "type": "DEPOSIT"
-     }
-     ```
-   - Response (Example from `TransactionExampleModels.createTransactionResponse`):
-     ```json
-     {
-       "transactionId": "67890",
-       "status": "APPROVED"
-     }
-     ```
+#### Get Wallets
 
-2. **Get User Transactions**
-   - **GET** `/transactions`
-   - Query Parameters:
-      - `walletName`: The name of the wallet
-      - `status`: Transaction status (e.g., `PENDING`, `APPROVED`, `DENIED`, `FAILED`)
-      - `transactionType`: Transaction type (`DEPOSIT`, `WITHDRAW`)
-   - Response (Example from `TransactionExampleModels.getTransactionResponse`):
-     ```json
-     [
-       {
-         "transactionId": "12345",
-         "amount": 50.0,
-         "status": "APPROVED",
-         "type": "DEPOSIT"
-       }
-     ]
-     ```
+- **Endpoint**: `/api/v1/wallet`
+- **Method**: `GET`
+- **Summary**: Fetches wallets for a user.
+- **Example Response**:
+  ```json
+  [
+    {
+      "walletName": "test_wallet",
+      "currency": "USD",
+      "usableBalance": 100.00,
+      "blockedBalance": 1000.00
+    },
+    {
+      "walletName": "eur_wallet",
+      "currency": "EUR",
+      "usableBalance": 0.00,
+      "blockedBalance": 0.00
+    }
+  ]
+  ```
 
-3. **Change Transaction Status**
-   - **PUT** `/transactions/change-status`
-   - Request Body (Example from `TransactionExampleModels.changeTransactionStatusRequest`):
-     ```json
-     {
-       "transactionId": "12345",
-       "newStatus": "APPROVED"
-     }
-     ```
-   - Response:
-     ```json
-     {
-       "message": "Transaction status updated successfully."
-     }
-     ```
+#### Create Wallet
 
-### Wallet Management APIs
-
-1. **Get Wallet Balance**
-   - **GET** `/wallets/{walletId}/balance`
-   - Response (Example from `WalletExampleModels.getWalletBalanceResponse`):
-     ```json
-     {
-       "walletId": "12345",
-       "balance": 100.00
-     }
-     ```
-
-2. **Create Wallet**
-   - **POST** `/wallets/create`
-   - Request Body (Example from `WalletExampleModels.createWalletRequest`):
-     ```json
-     {
-       "userId": "456"
-     }
-     ```
-   - Response:
-     ```json
-     {
-       "walletId": "12345",
-       "balance": 0.00
-     }
-     ```
-
-### User Management APIs
-
-1. **Get User Details**
-   - **GET** `/users/{userId}/details`
-   - Response (Example from `UserExampleModels.getUserDetailsResponse`):
-     ```json
-     {
-       "userId": "456",
-       "username": "exampleUser"
-     }
-     ```
-
-### Credential APIs
-
-1. **Login Credential**
-   - **POST** `/credentials/login`
-   - Request Body (Example from `CredentialExampleModels.loginRequest`):
-     ```json
-     {
-       "username": "exampleUser",
-       "password": "examplePassword"
-     }
-     ```
-   - Response:
-     ```json
-     {
-       "token": "Bearer abc.def.ghi"
-     }
-     ```
+- **Endpoint**: `/api/v1/wallet`
+- **Method**: `POST`
+- **Summary**: Creates a new wallet with zero balance.
+- **Request Body Example**:
+  ```json
+  {
+    "walletName": "eur_wallet",
+    "currency": "EUR"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "walletId": "12345",
+    "usableBalance": 0.00,
+    "blockedBalance": 0.00
+  }
+  ```
 
 ---
 
-## License
+### Transaction Management
 
+#### Get Transactions
+
+- **Endpoint**: `/api/v1/transaction`
+- **Method**: `GET`
+- **Summary**: Retrieve transactions based on filters.
+- **Query Parameters**:
+  - `walletName` (Optional): User's wallet name.
+  - `status` (Optional): `PENDING`, `APPROVED`, `DENIED`, `FAILED`.
+  - `transactionType` (Optional): `DEPOSIT`, `WITHDRAW`.
+- **Example Response**:
+  ```json
+  [
+    {
+      "walletName": "test_wallet",
+      "transactionKey": "021afc16-037a-4c38-8e20-111ca320a331",
+      "transactionType": "DEPOSIT",
+      "transactionStatus": "APPROVED",
+      "amount": 100.00
+    },
+    {
+      "walletName": "test_wallet",
+      "transactionKey": "4edc261a-a640-4d2f-bd62-0543200fbb07",
+      "transactionType": "WITHDRAW",
+      "transactionStatus": "APPROVED",
+      "amount": 50.00
+    }
+  ]
+  ```
+
+#### Create Transaction
+
+- **Endpoint**: `/api/v1/transaction`
+- **Method**: `POST`
+- **Summary**: Initiates a transaction.
+- **Request Body Example**:
+  ```json
+  {
+    "walletName": "test_wallet",
+    "transactionType": "WITHDRAW",
+    "amount": 1001
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "transactionKey": "09681f9d-d708-4791-bc7a-34e711aeb7f1",
+    "transactionStatus": "PENDING"
+  }
+  ```
+
+---
+
+### User Management
+
+#### Get User Details
+
+- **Endpoint**: `/api/v1/user`
+- **Method**: `GET`
+- **Summary**: Fetches logged in user.
+- **Example Response**:
+  ```json
+  {
+    "username": "test_user",
+    "userKey": "f3bce47d-43e2-4715-b3d6-8ef979c9d675"
+  }
+  ```
+
+---
+
+### Credential Management
+
+#### Sign In
+
+- **Endpoint**: `/api/v1/credential/sign-in`
+- **Method**: `POST`
+- **Summary**: Authorizes users with credentials.
+- **Request Body Example**:
+  ```json
+  {
+    "username":"test_user",
+    "password":"123456"
+  }
+  ```
+- **Example Response**:
+  ```json
+  {
+    "accessToken": "Bearer abc.def.ghi"
+  }
+  ```
+
+#### Sign Up
+
+- **Endpoint**: `/api/v1/credential/sign-up`
+- **Method**: `POST`
+- **Summary**: Sign up a new user.
+- **Request Body Example**:
+  ```json
+  {
+    "username":"test_user",
+    "password":"123456"
+  }
+  ```
+---
+
+## Authorization
+
+APIs require the `Authorization` header with a Bearer token. Unauthorized requests will return a `401 Unauthorized`
+error.
+
+---
 This project is licensed under the **MIT License**.

@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Data
 public class UserTransactionResponseDto {
     private String walletName;
+    private String transactionKey;
     private TransactionTypeEnum transactionType;
     private TransactionStatusEnum transactionStatus;
     @JsonSerialize(using = MoneySerializer.class)

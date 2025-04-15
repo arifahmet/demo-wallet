@@ -43,7 +43,7 @@ public class TransactionEntity extends BaseEntity {
     private LocalDateTime statusChangedAt;
 
 
-    public static TransactionEntity of(TransactionStatusEnum transactionStatus,
+    public static TransactionEntity of(
                                        WalletEntity walletEntity,
                                        CreateTransactionRequestDto transactionRequest,
                                        String description) {
@@ -52,9 +52,9 @@ public class TransactionEntity extends BaseEntity {
                 .walletId(walletEntity.getId())
                 .transactionKey(UUID.randomUUID().toString())
                 .transactionType(transactionRequest.getTransactionType())
-                .transactionStatus(transactionStatus)
+                .transactionStatus(TransactionStatusEnum.PENDING)
                 .amount(transactionRequest.getAmount())
-                .statusChangedAt(TransactionStatusEnum.PENDING.equals(transactionStatus) ? null : created)
+                .statusChangedAt(null)
                 .description(description)
                 .created(created)
                 .updated(created)
