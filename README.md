@@ -29,13 +29,14 @@ Swagger is integrated for API documentation and testing.
 - **Spring WebFlux** (Reactive programming)
 - **Reactive Kafka** (Kafka event-handling)
 - **Lombok** (Reduce boilerplate code)
-- **Docker Compose** (Setup Kafka environments)
+- **Docker Compose** (Setup Kafka and Postgres environments)
+- **Liquibase** (Db migration/initialization)
 
 ---
 
 ## How to Run Kafka Locally with Docker Compose
 
-Kafka is setup with a `docker-compose.yaml` file in the `kafka` directory.
+Kafka and Postgres is setup with a `docker-compose.yaml` file in the `kafka` directory.
 
 1. Navigate to the `kafka` folder.
    ```bash
@@ -98,8 +99,11 @@ Kafka is setup with a `docker-compose.yaml` file in the `kafka` directory.
   ```json
   {
     "walletName": "eur_wallet",
-    "currency": "EUR"
-  }
+    "currency": "EUR",
+    "activeForWithdraw": false,
+    "activeForShopping": true
+
+}
   ```
 - **Response**:
   ```json
@@ -141,36 +145,19 @@ Kafka is setup with a `docker-compose.yaml` file in the `kafka` directory.
   [
     {
         "walletName": "test_wallet",
-        "transactionKey": "c8bf8f40-bb7c-4767-b6d9-77aa4084ed4f",
-        "transactionType": "DEPOSIT",
-        "transactionStatus": "APPROVED",
-        "oppositePartyType": "IBAN",
-        "amount": "1000.00",
-        "description": null,
-        "created": "2025-04-15 06:58:07",
-        "statusChangeTime": "2025-04-15 06:58:19"
+        "currency": "USD",
+        "usableBalance": "2997.00",
+        "blockedBalance": "0.00",
+        "activeForWithdraw": false,
+        "activeForShopping": true
     },
     {
-        "walletName": "test_wallet",
-        "transactionKey": "286e01ed-7a47-4307-b863-993947f92c4e",
-        "transactionType": "DEPOSIT",
-        "transactionStatus": "APPROVED",
-        "oppositePartyType": "IBAN",
-        "amount": "1000.00",
-        "description": null,
-        "created": "2025-04-15 06:58:41",
-        "statusChangeTime": "2025-04-15 06:58:53"
-    },
-    {
-        "walletName": "test_wallet",
-        "transactionKey": "9d76a96a-7ecb-4b12-bdcf-738222d37719",
-        "transactionType": "WITHDRAW",
-        "transactionStatus": "APPROVED",
-        "oppositePartyType": "BANK_ACCOUNT",
-        "amount": "1001.00",
-        "description": null,
-        "created": "2025-04-15 07:00:06",
-        "statusChangeTime": "2025-04-15 07:00:30"
+        "walletName": "eur_wallet",
+        "currency": "EUR",
+        "usableBalance": "0.00",
+        "blockedBalance": "0.00",
+        "activeForWithdraw": false,
+        "activeForShopping": true
     }
   ]
   ```

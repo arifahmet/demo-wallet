@@ -11,4 +11,5 @@ public class CreateWalletRequestDto {
     @NotNull
     private CurrenyEnum currency;
     private boolean activeForWithdraw;
+    private boolean activeForShopping;
 }

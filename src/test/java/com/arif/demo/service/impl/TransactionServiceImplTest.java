@@ -11,14 +11,24 @@ import com.arif.demo.model.web.transaction.TransactionResponseDto;
 import com.arif.demo.repository.TransactionRepository;
 import com.arif.demo.security.TokenUtil;
 import com.arif.demo.service.WalletService;
+import jakarta.validation.constraints.NotNull;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.ReactiveTransactionManager;
+import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.reactive.TransactionCallback;
+import org.springframework.transaction.reactive.TransactionalOperator;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -30,8 +40,10 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class TransactionServiceImplTest {
+
     @InjectMocks
     TransactionServiceImpl service;
+
     @Mock
     private TransactionRepository transactionRepository;
 
@@ -44,9 +56,41 @@ class TransactionServiceImplTest {
     @Mock
     private ReactiveKafkaProducerTemplate<String, TransactionEvent> transactionProducerTemplate;
 
+    @Mock
+    private ReactiveTransactionManager reactiveTransactionManager;
+
+
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(service, "transactionLimit", new BigDecimal("5000"));
+    }
+
+    @BeforeAll
+    public static void stub() {
+        utilities = Mockito.mockStatic(TransactionalOperator.class);
+        utilities.when(() -> TransactionalOperator.create(any(ReactiveTransactionManager.class))).thenReturn(getTransactionalOperator());
+    }
+
+    @AfterAll
+    public static void unStub() {
+        utilities.close();
+    }
+
+    private static MockedStatic<TransactionalOperator> utilities = null;
+
+    protected static TransactionalOperator getTransactionalOperator() {
+        return new TransactionalOperator() {
+            @NotNull
+            @Override
+            public <T> Mono<T> transactional(Mono<T> mono) {
+                return mono;
+            }
+
+            @Override
+            public <T> Flux<T> execute(TransactionCallback<T> action) throws TransactionException {
+                return null;
+            }
+        };
     }
 
     @Test

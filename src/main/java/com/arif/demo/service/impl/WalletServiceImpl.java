@@ -7,6 +7,7 @@ import com.arif.demo.model.entity.TransactionEntity;
 import com.arif.demo.model.entity.WalletEntity;
 import com.arif.demo.model.enums.TransactionStatusEnum;
 import com.arif.demo.model.enums.TransactionTypeEnum;
+import com.arif.demo.model.web.wallet.ChanceShoppingStatusRequestDto;
 import com.arif.demo.model.web.wallet.ChanceWithdrawStatusRequestDto;
 import com.arif.demo.model.web.wallet.CreateWalletRequestDto;
 import com.arif.demo.model.web.wallet.GetUserWalletResponseDto;
@@ -46,6 +47,12 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
+    public Mono<Void> chanceShoppingStatus(ChanceShoppingStatusRequestDto request) {
+        return getUserWalletByName(request.getWalletName()).flatMap(wallet ->
+                walletRepository.updateShoppingStatus(wallet.getId(), request.isActiveForShopping())).then();
+    }
+
+    @Override
     public Mono<WalletEntity> getUserWalletByName(String walletName) {
         return userService.getUser()
                 .flatMap(userEntity -> walletRepository.findWallet(userEntity.getUserKey(), walletName))
@@ -63,7 +70,6 @@ public class WalletServiceImpl implements WalletService {
                 var blockAmountChange = getBlockAmountChange(transactionEntity);
                 return walletRepository.changeBalance(walletEntity.getId(), usableAmountChange, blockAmountChange).thenReturn(walletEntity);
             }
-
             return Mono.error(new InsufficientBalanceException());
         });
     }
@@ -93,9 +99,7 @@ public class WalletServiceImpl implements WalletService {
     private BigDecimal getUsableAmountChange(TransactionEntity transactionEntity) {
         if (TransactionStatusEnum.APPROVED.equals(transactionEntity.getTransactionStatus())) {
             return TransactionTypeEnum.DEPOSIT.equals(transactionEntity.getTransactionType()) ? transactionEntity.getAmount() : BigDecimal.ZERO;
-        } else if (TransactionStatusEnum.PENDING.equals(transactionEntity.getTransactionStatus())) {
-            return TransactionTypeEnum.DEPOSIT.equals(transactionEntity.getTransactionType()) ? BigDecimal.ZERO : transactionEntity.getAmount().negate();
         }
-        return TransactionTypeEnum.DEPOSIT.equals(transactionEntity.getTransactionType()) ? transactionEntity.getAmount().negate() : transactionEntity.getAmount();
+        return TransactionTypeEnum.DEPOSIT.equals(transactionEntity.getTransactionType()) ? BigDecimal.ZERO : transactionEntity.getAmount().negate();
     }
 }

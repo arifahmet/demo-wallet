@@ -21,6 +21,8 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.ReactiveTransactionManager;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.kafka.receiver.ReceiverRecord;
@@ -38,6 +40,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final WalletService walletService;
     private final UserService userService;
+    private final ReactiveTransactionManager reactiveTransactionManager;
     private final ReactiveKafkaProducerTemplate<String, TransactionEvent> transactionProducerTemplate;
 
     @Override
@@ -107,7 +110,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Mono<TransactionEntity> processTransaction(TransactionEntity transaction) {
-        return walletService.changeUserWalletBalance(transaction)
+        final TransactionalOperator rxtx = TransactionalOperator.create(reactiveTransactionManager);
+        return rxtx.transactional(walletService.changeUserWalletBalance(transaction))
                 .onErrorResume(error -> handleTransactionError(transaction, error).thenReturn(new WalletEntity()))
                 .flatMap(wallet -> saveTransaction(transaction)
                         .flatMap(savedTransaction -> checkAutoProcesseTransaction(wallet, savedTransaction)));

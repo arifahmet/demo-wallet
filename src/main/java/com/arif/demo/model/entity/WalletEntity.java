@@ -35,6 +35,8 @@ public class WalletEntity extends BaseEntity {
     private BigDecimal blockedBalance;
     @Column("ACTIVE_FOR_WITHDRAW")
     private boolean activeForWithdraw;
+    @Column("ACTIVE_FOR_MARKET")
+    private boolean activeForShopping;
 
 
     public static WalletEntity of(UserEntity user, CreateWalletRequestDto createWalletRequest) {
@@ -46,6 +48,7 @@ public class WalletEntity extends BaseEntity {
                 .usableBalance(BigDecimal.ZERO)
                 .blockedBalance(BigDecimal.ZERO)
                 .activeForWithdraw(createWalletRequest.isActiveForWithdraw())
+                .activeForShopping(createWalletRequest.isActiveForShopping())
                 .created(created)
                 .updated(created)
                 .build();
