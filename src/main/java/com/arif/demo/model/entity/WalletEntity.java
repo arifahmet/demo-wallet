@@ -1,6 +1,7 @@
 package com.arif.demo.model.entity;
 
 import com.arif.demo.model.web.wallet.CreateWalletRequestDto;
+import com.arif.demo.model.web.wallet.CurrenyEnum;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
@@ -27,7 +28,7 @@ public class WalletEntity extends BaseEntity {
     @Column("WALLET_NAME")
     private String walletName;
     @Column("CURRENCY")
-    private String currency;
+    private CurrenyEnum currency;
     @Column("USABLE_BALANCE")
     private BigDecimal usableBalance;
     @Column("BLOCKED_BALANCE")
@@ -39,7 +40,7 @@ public class WalletEntity extends BaseEntity {
         return WalletEntity.builder()
                 .userId(user.getId())
                 .walletName(createWalletRequest.getWalletName())
-                .currency(createWalletRequest.getCurrency().name())
+                .currency(createWalletRequest.getCurrency())
                 .usableBalance(BigDecimal.ZERO)
                 .blockedBalance(BigDecimal.ZERO)
                 .created(created)

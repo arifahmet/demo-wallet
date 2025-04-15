@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Builder
 public class GetUserWalletResponseDto {
     private String walletName;
-    private String currency;
+    private CurrenyEnum currency;
     @JsonSerialize(using = MoneySerializer.class)
     private BigDecimal usableBalance;
     @JsonSerialize(using = MoneySerializer.class)
