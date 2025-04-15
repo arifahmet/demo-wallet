@@ -1,5 +1,6 @@
 package com.arif.demo.service.impl;
 
+import com.arif.demo.exception.model.UnauthorizedException;
 import com.arif.demo.model.entity.UserEntity;
 import com.arif.demo.model.web.user.GetUserResponseDto;
 import com.arif.demo.repository.UserRepository;
@@ -41,7 +42,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getUser_whenUserNotFound_returnsEmpty() {
+    void getUser_whenUserNotFound_throwException() {
         String userKey = "nonExistentUserKey";
 
         when(tokenUtil.getUserKey()).thenReturn(Mono.just(userKey));
@@ -50,7 +51,8 @@ class UserServiceImplTest {
         Mono<GetUserResponseDto> result = userService.getUserInfo();
 
         StepVerifier.create(result)
-                .verifyComplete();
+                .expectErrorMatches(throwable -> throwable instanceof UnauthorizedException)
+                .verify();
     }
 
     @Test

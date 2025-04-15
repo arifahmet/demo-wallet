@@ -43,28 +43,12 @@ public class WalletServiceImplTest {
         walletEntity.setCurrency(requestDto.getCurrency());
 
         Mockito.when(tokenUtil.getUserKey()).thenReturn(Mono.just("testUserKey"));
-        Mockito.when(userService.getUserByUserKey("testUserKey")).thenReturn(Mono.just(new UserEntity()));
+        Mockito.when(userService.getUser()).thenReturn(Mono.just(new UserEntity()));
         Mockito.when(walletRepository.save(Mockito.any(WalletEntity.class))).thenReturn(Mono.just(walletEntity));
 
         StepVerifier.create(walletService.createWallet(requestDto))
                 .verifyComplete();
 
         Mockito.verify(walletRepository, Mockito.times(1)).save(Mockito.any(WalletEntity.class));
-    }
-
-    @Test
-    public void createWallet_userNotFound() {
-        CreateWalletRequestDto requestDto = new CreateWalletRequestDto();
-        requestDto.setWalletName("TestWallet");
-        requestDto.setCurrency(CurrenyEnum.EUR);
-
-        Mockito.when(tokenUtil.getUserKey()).thenReturn(Mono.just("testUserKey"));
-        Mockito.when(userService.getUserByUserKey("testUserKey")).thenReturn(Mono.empty());
-
-        StepVerifier.create(walletService.createWallet(requestDto))
-                .expectErrorMatches(throwable -> throwable instanceof RuntimeException && throwable.getMessage().equals("User not found"))
-                .verify();
-
-        Mockito.verify(walletRepository, Mockito.never()).save(Mockito.any(WalletEntity.class));
     }
 }
