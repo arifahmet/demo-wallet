@@ -5,9 +5,9 @@ This project is a **Spring Boot** application designed for managing transactions
 ## Features
 
 - **Transaction Management**
-    - Create and process transactions (credit/debit).
+    - Create and process transactions (DEPOSIT/WITHDRAW).
     - Transactions under the configured limit are automatically approved.
-  - Transactions exceeding the limit are flagged as "PENDING" and require user action to approve or reject.
+    - Transactions exceeding the limit are flagged as "PENDING" and require user action to approve or reject.
     - Retrieve user transactions based on specific filters (e.g., status or type).
 
 - **Reactive Design**
@@ -104,7 +104,7 @@ Make sure **Kafka** is running before starting the application to avoid runtime 
       {
         "walletId": "12345",
         "amount": 100.00,
-        "type": "DEBIT"
+        "type": "DEPOSIT"
       }
       ```
     - Response (if the transaction amount is below the limit):
@@ -128,7 +128,7 @@ Make sure **Kafka** is running before starting the application to avoid runtime 
     - Query Parameters:
         - `walletName`: The name of the wallet
         - `status`: Transaction status (e.g., `PENDING`, `APPROVED`, `DENIED`, `FAILED`)
-        - `transactionType`: Transaction type (`CREDIT`, `DEBIT`)
+        - `transactionType`: Transaction type (`DEPOSIT`, `WITHDRAW`)
     - Response:
       ```json
       [
@@ -136,7 +136,7 @@ Make sure **Kafka** is running before starting the application to avoid runtime 
           "transactionId": "12345",
           "amount": 50.0,
           "status": "APPROVED",
-          "type": "CREDIT"
+          "type": "DEPOSIT"
         }
       ]
       ```
@@ -192,15 +192,14 @@ Make sure **Kafka** is running before starting the application to avoid runtime 
     - Request Body:
       ```json
       {
-        "userId": "456",
-        "initialBalance": 500.00
+        "userId": "456"
       }
       ```
     - Response:
       ```json
       {
         "walletId": "12345",
-        "balance": 500.00
+        "balance": 0.00
       }
       ```
 
@@ -212,12 +211,12 @@ Make sure **Kafka** is running before starting the application to avoid runtime 
       ```json
       {
         "userId": "456",
-        "username": "exampleUser",
-        "email": "example@example.com"
+        "username": "exampleUser"
       }
       ```
-      
+
 ---
+
 ## License
 
 This project is licensed under the **MIT License**.
