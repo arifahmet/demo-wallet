@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: demo
+  r2dbc:
+    url: "r2dbc:h2:mem:///~/db/demodb"
+    username: "sa"
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  kafka:
+    consumer:
+      group-id: "demo"
+      auto-offset-reset: latest
+    producer:
+      bootstrap-servers: "127.0.0.1:9092"
+server:
+  port: 8044
+  compression:
+    enabled: true
+db:
+  url: "jdbc:h2:mem:~/db/demodb;DB_CLOSE_DELAY=-1"
+  user: "sa"
+  password:
+  change-log: "classpath:db/changelog/changeLog-master.xml"
+springdoc:
+  swagger-ui:
+    path: "/swagger-ui.html"
+jwt:
+  secret-key: "594d8086ce2d4f38a5d94589bc45468c0b01cd665b1347ce7dd7d8d8b5543aad7b89342b378df55f5c22e556c2"
+  access-expiration-time: 3600000
+  refresh-expiration-time: 86400000
+transaction-limit: 1000
+
+security:
+  enable: true
+  exclusion-uri-property-list:
+    - uri: "/api/v1/credential/sign-in"
+      method: "POST"
+    - uri: "/api/v1/credential/sign-up"
+      method: "POST"
+    - uri: "/swagger-ui.html"
+      method: "GET"
+    - uri: "/webjars/swagger-ui/index.html"
+      method: "GET"
+    - uri: "/webjars/swagger-ui/swagger-ui.css"
+      method: "GET"
+    - uri: "/webjars/swagger-ui/swagger-ui-bundle.js"
+      method: "GET"
+    - uri: "/webjars/swagger-ui/index.css"
+      method: "GET"
+    - uri: "/webjars/swagger-ui/index.css"
+      method: "GET"
+    - uri: "/webjars/swagger-ui/swagger-ui-standalone-preset.js"
+      method: "GET"
+    - uri: "/webjars/swagger-ui/swagger-initializer.js"
+      method: "GET"
+    - uri: "/v3/api-docs/swagger-config"
+      method: "GET"
+    - uri: "/v3/api-docs"
+      method: "GET"
+    - uri: "/webjars/swagger-ui/favicon-32x32.png"
+      method: "GET"
+    - uri: "/webjars/swagger-ui/favicon-16x16.png"
