@@ -4,7 +4,6 @@ package com.arif.demo.security;
 import com.arif.demo.security.model.JwtToken;
 import com.arif.demo.security.properties.ExclusionUriProperty;
 import com.arif.demo.security.properties.SecurityProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,7 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
-import java.util.*;
+import java.util.Objects;
 
 @Slf4j
 @Component

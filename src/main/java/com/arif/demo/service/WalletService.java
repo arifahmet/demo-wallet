@@ -2,7 +2,6 @@ package com.arif.demo.service;
 
 import com.arif.demo.model.entity.TransactionEntity;
 import com.arif.demo.model.entity.WalletEntity;
-import com.arif.demo.model.web.transaction.TransactionResponseDto;
 import com.arif.demo.model.web.wallet.CreateWalletRequestDto;
 import com.arif.demo.model.web.wallet.GetUserWalletResponseDto;
 import reactor.core.publisher.Flux;

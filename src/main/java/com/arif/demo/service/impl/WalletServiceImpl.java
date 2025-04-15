@@ -2,11 +2,11 @@ package com.arif.demo.service.impl;
 
 import com.arif.demo.exception.InsufficientBalanceException;
 import com.arif.demo.exception.UnauthorizedException;
+import com.arif.demo.exception.WalletNotFoundException;
 import com.arif.demo.model.entity.TransactionEntity;
 import com.arif.demo.model.entity.WalletEntity;
 import com.arif.demo.model.enums.TransactionStatusEnum;
 import com.arif.demo.model.enums.TransactionTypeEnum;
-import com.arif.demo.model.web.transaction.CreateTransactionRequestDto;
 import com.arif.demo.model.web.wallet.CreateWalletRequestDto;
 import com.arif.demo.model.web.wallet.GetUserWalletResponseDto;
 import com.arif.demo.repository.WalletRepository;
@@ -63,7 +63,7 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public Mono<WalletEntity> getUserWalletById(Long walletId) {
         return walletRepository.findById(walletId)
-                .switchIfEmpty(Mono.error(new UnauthorizedException("Wallet not found")));
+                .switchIfEmpty(Mono.error(new WalletNotFoundException()));
     }
 
     private boolean hasSufficientUsableBalance(WalletEntity walletEntity, TransactionEntity transactionEntity) {
