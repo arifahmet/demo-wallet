@@ -155,6 +155,26 @@ Kafka is setup with a `docker-compose.yaml` file in the `kafka` directory.
   }
   ```
 
+#### Approve/Deny Transaction
+
+- **Endpoint**: `/api/v1/transaction/status`
+- **Method**: `POST`
+- **Summary**: Approve or Deny a transaction.
+- **Request Body Example For Approve**:
+  ```json
+  {
+    "transactionKey": "09681f9d-d708-4791-bc7a-34e711aeb7f1",
+    "transactionStatus": "APPROVED"
+  }
+  ```
+- **Request Body Example For Deny**:
+  ```json
+  {
+    "transactionKey": "09681f9d-d708-4791-bc7a-34e711aeb7f1",
+    "transactionStatus": "DENIED"
+  }
+  ```
+
 ---
 
 ### User Management
