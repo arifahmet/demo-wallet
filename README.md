@@ -66,16 +66,25 @@ Kafka is setup with a `docker-compose.yaml` file in the `kafka` directory.
   ```json
   [
     {
-      "walletName": "test_wallet",
-      "currency": "USD",
-      "usableBalance": 100.00,
-      "blockedBalance": 1000.00
+        "walletName": "test_wallet",
+        "currency": "USD",
+        "usableBalance": "0.00",
+        "blockedBalance": "0.00",
+        "activeForWithdraw": true
     },
     {
-      "walletName": "eur_wallet",
-      "currency": "EUR",
-      "usableBalance": 0.00,
-      "blockedBalance": 0.00
+        "walletName": "eur_wallet",
+        "currency": "USD",
+        "usableBalance": "0.00",
+        "blockedBalance": "0.00",
+        "activeForWithdraw": true
+    },
+    {
+        "walletName": "eurr_wallet",
+        "currency": "EUR",
+        "usableBalance": "0.00",
+        "blockedBalance": "0.00",
+        "activeForWithdraw": true
     }
   ]
   ```
@@ -98,6 +107,19 @@ Kafka is setup with a `docker-compose.yaml` file in the `kafka` directory.
     "walletId": "12345",
     "usableBalance": 0.00,
     "blockedBalance": 0.00
+  }
+  ```
+
+#### Change Wallet Withdraw Status
+
+- **Endpoint**: `/api/v1/wallet/withdraw-status`
+- **Method**: `POST`
+- **Summary**: Wallet withdraw status changer.
+- **Request Body Example**:
+  ```json
+  {
+    "walletName": "test_wallet",
+    "activeForWithdraw": false
   }
   ```
 

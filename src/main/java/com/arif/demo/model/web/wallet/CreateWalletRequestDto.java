@@ -10,4 +10,5 @@ public class CreateWalletRequestDto {
     private String walletName;
     @NotNull
     private CurrenyEnum currency;
+    private boolean activeForWithdraw;
 }

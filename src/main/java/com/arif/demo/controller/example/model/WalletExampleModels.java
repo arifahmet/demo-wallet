@@ -7,22 +7,36 @@ import lombok.NoArgsConstructor;
 public class WalletExampleModels {
     public static final String GET_USER_WALLETS_RESPONSE = """
             [
-                {
-                    "walletName": "test_wallet",
-                    "currency": "USD",
-                    "usableBalance": "0.00",
-                    "blockedBalance": "-1001.00"
-                },
-                {
-                    "walletName": "eur_wallet",
-                    "currency": "EUR",
-                    "usableBalance": "0.00",
-                    "blockedBalance": "0.00"
-                }
+                 {
+                     "walletName": "test_wallet",
+                     "currency": "USD",
+                     "usableBalance": "0.00",
+                     "blockedBalance": "0.00",
+                     "activeForWithdraw": true
+                 },
+                 {
+                     "walletName": "eur_wallet",
+                     "currency": "USD",
+                     "usableBalance": "0.00",
+                     "blockedBalance": "0.00",
+                     "activeForWithdraw": true
+                 },
+                 {
+                     "walletName": "eurr_wallet",
+                     "currency": "EUR",
+                     "usableBalance": "0.00",
+                     "blockedBalance": "0.00",
+                     "activeForWithdraw": true
+                 }
             ]""";
     public static final String CREATE_WALLET_REQUEST = """
             {
                  "walletName": "eur_wallet",
                  "currency": "EUR"
+            }""";
+    public static final String CHANGE_WALLET_WITHDRAW_STATUS_REQUEST = """
+            {
+                "walletName": "test_wallet",
+                "activeForWithdraw": false
             }""";
 }

@@ -58,6 +58,9 @@
             <column name="BLOCKED_BALANCE" type="numeric(30,10)" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
+            <column name="ACTIVE_FOR_WITHDRAW" type="bool">
+                <constraints nullable="false"/>
+            </column>
             <column name="CREATED" type="timestamptz">
                 <constraints nullable="false"/>
             </column>

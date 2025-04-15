@@ -36,4 +36,12 @@ public interface WalletRepository extends ReactiveCrudRepository<WalletEntity, L
             WHERE ID = :walletId
             """)
     Mono<Void> changeBalance(Long walletId, BigDecimal usableMountChange, BigDecimal blockAmountChange);
+
+    @Modifying
+    @Query("""
+            UPDATE dm_wallet
+            SET ACTIVE_FOR_WITHDRAW= :withdrawStatus
+            WHERE ID = :walletId
+            """)
+    Mono<Void> updateWithdrawStatus(Long walletId, boolean withdrawStatus);
 }

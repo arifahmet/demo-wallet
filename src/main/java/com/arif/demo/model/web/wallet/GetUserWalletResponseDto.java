@@ -17,6 +17,7 @@ public class GetUserWalletResponseDto {
     private BigDecimal usableBalance;
     @JsonSerialize(using = MoneySerializer.class)
     private BigDecimal blockedBalance;
+    private boolean activeForWithdraw;
 
     public static GetUserWalletResponseDto of(WalletEntity walletEntity) {
         return GetUserWalletResponseDto.builder()
@@ -24,6 +25,7 @@ public class GetUserWalletResponseDto {
                 .currency(walletEntity.getCurrency())
                 .usableBalance(walletEntity.getUsableBalance())
                 .blockedBalance(walletEntity.getBlockedBalance())
+                .activeForWithdraw(walletEntity.isActiveForWithdraw())
                 .build();
     }
 }
