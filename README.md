@@ -102,8 +102,7 @@ Kafka and Postgres is setup with a `docker-compose.yaml` file in the `kafka` dir
     "currency": "EUR",
     "activeForWithdraw": false,
     "activeForShopping": true
-
-}
+  }
   ```
 - **Response**:
   ```json
